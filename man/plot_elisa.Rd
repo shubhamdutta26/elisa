@@ -2,28 +2,70 @@
 % Please edit documentation in R/plot_elisa.R
 \name{plot_elisa}
 \alias{plot_elisa}
-\title{xxx}
+\title{Plots microplate ELISA data}
 \usage{
-plot_elisa(file, group, x, plot_group, xlog = FALSE, errorbars = FALSE, ...)
+plot_elisa(
+  file,
+  primary,
+  od,
+  group_by,
+  x,
+  color,
+  point_size = 3,
+  linewidth = 0.5,
+  xlog = FALSE,
+  errorbars = FALSE,
+  errorbar_width = 0.2,
+  filter_col = NULL,
+  filter_data = NULL,
+  ...
+)
 }
 \arguments{
-\item{file}{xxx}
+\item{file}{A character quoted string containing the path to a csv or excel
+plate file.}
 
-\item{group}{xxx}
+\item{primary}{An unquoted character string of the main plate name with
+"blanks".}
 
-\item{x}{xxx}
+\item{od}{An unquoted character string of the plate name containing the od
+data.}
 
-\item{plot_group}{xxx}
+\item{group_by}{An unquoted character vector of the plate name(s) for
+grouping the data}
 
-\item{xlog}{xxx}
+\item{x}{An unquoted character string for the x axis variable for ggplot2::aes.}
 
-\item{errorbars}{xxx}
+\item{color}{An unquoted character string for color in ggplot2::aes.}
 
-\item{...}{xxx}
+\item{point_size}{A numeric value for size in ggplot2.}
+
+\item{linewidth}{A numeric value for linewidth in ggplot2.}
+
+\item{xlog}{A logical value that transforms x-axis to log10 (default is FALSE).}
+
+\item{errorbars}{A logical value that adds errorbars (with sd) (default is FALSE).}
+
+\item{errorbar_width}{A numeric value for errorbar width in ggplot2.}
+
+\item{filter_col}{An unquoted character string to select plate name on which
+the dplyr::filter will be used.}
+
+\item{filter_data}{An quoted character vector that needs to be filtered out
+from `filter_col` using the dplyr::filter function.}
+
+\item{...}{Any other arguments from tidyplate::tidy_plate function}
 }
 \value{
-xxx
+A ggplot2 object
 }
 \description{
-xxx
+Plots microplate ELISA data
+}
+\examples{
+file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
+plot_elisa(file, primary = primary_mab, od = od450,
+           group_by = c(primary_mab, primary_mab_conc),
+           x = primary_mab_conc, color = primary_mab,
+           xlog = TRUE, errorbars = TRUE)
 }
