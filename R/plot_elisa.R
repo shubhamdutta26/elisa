@@ -1,23 +1,18 @@
-#' Title
+#' xxx
 #'
-#' @param file
-#' @param group
-#' @param x
-#' @param plot_group
-#' @param xlog
-#' @param errorbars
-#' @param ...
+#' @param file xxx
+#' @param group xxx
+#' @param x xxx
+#' @param plot_group xxx
+#' @param xlog xxx
+#' @param errorbars xxx
+#' @param ... xxx
 #'
-#' @return
+#' @return xxx
 #' @export
 #' @importFrom stats sd
 #'
 #' @examples
-#'
-
-# Declare global variables to avoid "no visible binding for global variable" note
-utils::globalVariables(c("od450", "mean_blank", "blanked_od", "primary_mab", "mean_od", "mean_sd"))
-
 plot_elisa <- function(file,
                        group,
                        x,
@@ -28,11 +23,11 @@ plot_elisa <- function(file,
 
   raw_data <- tidyplate::tidy_plate(file,...)
 
-  col_names <- c("primary_mab", "od450")
-
-  if (col_names %in% names(raw_data)) {
-    stop("Input data must have 'primary_mab' and 'od450'.")
-  }
+  # col_names <- c("primary_mab", "od450")
+  #
+  # if (col_names %in% names(raw_data)) {
+  #   stop("Input data must have 'primary_mab' and 'od450'.")
+  # }
 
   mean_blank <- raw_data |>
     dplyr::filter(primary_mab == "blank") |>
