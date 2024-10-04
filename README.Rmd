@@ -36,12 +36,12 @@ This is a basic example which shows you how plot ELISA data:
 
 ```{r example}
 library(elisa)
-# file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
-# plot_elisa(file = path,
-#            group = c(primary_mab, primary_mab_conc),
-#            x = primary_mab_conc,
-#            plot_group = primary_mab,
-#            xlog = TRUE, errorbars = TRUE)
+file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
+plot_elisa(file,
+           group = c(primary_mab, primary_mab_conc),
+           x = primary_mab_conc,
+           plot_group = primary_mab,
+           xlog = TRUE, errorbars = TRUE)
 ```
 
 More updates will be posted at a later time.

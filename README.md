@@ -27,12 +27,18 @@ This is a basic example which shows you how plot ELISA data:
 
 ``` r
 library(elisa)
-# file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
-# plot_elisa(file = path,
-#            group = c(primary_mab, primary_mab_conc),
-#            x = primary_mab_conc,
-#            plot_group = primary_mab,
-#            xlog = TRUE, errorbars = TRUE)
+file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
+plot_elisa(file,
+           group = c(primary_mab, primary_mab_conc),
+           x = primary_mab_conc,
+           plot_group = primary_mab,
+           xlog = TRUE, errorbars = TRUE)
+#> Data: elisa_example.xlsx; Plate type: 96-well plate
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning in sqrt(diag(varMat)): NaNs produced
+#> Warning in sqrt(diag(varMat)): NaNs produced
 ```
+
+<img src="man/figures/README-example-1.png" width="100%" />
 
 More updates will be posted at a later time.
