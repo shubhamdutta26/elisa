@@ -28,10 +28,9 @@ This is a basic example which shows you how plot ELISA data:
 ``` r
 library(elisa)
 file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
-plot_elisa(file,
-           group = c(primary_mab, primary_mab_conc),
-           x = primary_mab_conc,
-           plot_group = primary_mab,
+plot_elisa(file, primary = primary_mab, od = od450,
+           group_by = c(primary_mab, primary_mab_conc),
+           x = primary_mab_conc, color = primary_mab,
            xlog = TRUE, errorbars = TRUE)
 #> Data: elisa_example.xlsx; Plate type: 96-well plate
 #> `geom_smooth()` using formula = 'y ~ x'
