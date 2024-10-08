@@ -32,10 +32,17 @@ pak::pak("shubhamdutta26/elisa")
 
 ## Example
 
-This is a basic example which shows you how plot ELISA data:
+The first step is to format the ELISA plate. A template can be build using the
+`create_plate` function:
 
-```{r example}
+```{r create-plate}
 library(elisa)
+# create_plate()
+```
+
+Next you can plot ELISA data:
+
+```{r plot}
 file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
 plot_elisa(file, primary = primary_mab, od = od450,
            group_by = c(primary_mab, primary_mab_conc),
@@ -43,4 +50,5 @@ plot_elisa(file, primary = primary_mab, od = od450,
            xlog = TRUE, errorbars = TRUE)
 ```
 
-More updates will be posted at a later time.
+To the plot you can add more ggplot2 layers using the `+` symbol. More updates 
+will be posted at a later time.
