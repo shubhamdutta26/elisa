@@ -13,18 +13,21 @@ create_plate(
 )
 }
 \arguments{
-\item{plate_type}{xxx}
+\item{plate_type}{An integer that defines the type of microwell plate (default
+is 96).}
 
-\item{n_plates}{xxx}
+\item{n_plates}{An integer that defines the total number of plates (default
+is 19).}
 
-\item{plate_names}{xxx}
+\item{plate_names}{A character vector that defines name of each plate.}
 
-\item{file_type}{xxx}
+\item{file_type}{A character string that defines type of file (default is
+xlsx)}
 
-\item{file_name}{xxx}
+\item{file_name}{A character string that defines name of file}
 }
 \value{
-xxx
+A xlsx or csv file (default is xlsx)
 }
 \description{
 Creates and ELISA plate template
