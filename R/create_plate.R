@@ -1,12 +1,15 @@
 #' Creates and ELISA plate template
 #'
-#' @param plate_type xxx
-#' @param n_plates xxx
-#' @param plate_names xxx
-#' @param file_type xxx
-#' @param file_name xxx
+#' @param plate_type An integer that defines the type of microwell plate (default
+#' is 96).
+#' @param n_plates An integer that defines the total number of plates (default
+#' is 19).
+#' @param plate_names A character vector that defines name of each plate.
+#' @param file_type A character string that defines type of file (default is
+#' xlsx)
+#' @param file_name A character string that defines name of file
 #'
-#' @return xxx
+#' @return A xlsx or csv file (default is xlsx)
 #' @importFrom utils write.table
 #' @export
 #'
@@ -31,9 +34,7 @@ create_plate <- function(plate_type = 96,
     stop("Invalid `n_plates` value provided. `n_plates` must be a positive integer.", call. = FALSE)
   }
 
-  if (!is.null(plate_names)) {
-    plate_names <- paste0("plate_", 1:n_plates)
-  } else {
+  if (is.null(plate_names)) {
     plate_names <- c("coat_protein_name", "coat_protein_ug", "coat_protein_vendor",
                      "coat_protein_cat", "coat_protein_lot", "coat_protein_source",
                      "primary_mab_name", "primary_mab_conc", "primary_mab_vendor",
@@ -41,6 +42,8 @@ create_plate <- function(plate_type = 96,
                      "detection_mab_name", "detection_mab_dil", "detection_mab_vendor",
                      "detection_mab_cat", "detection_mab_lot", "detection_mab_source",
                      "od450")
+  } else {
+    plate_names <- plate_names
   }
 
   # Validate file (if provided)
@@ -81,15 +84,17 @@ create_plate <- function(plate_type = 96,
   final_plate <- do.call(rbind, plate_list)
 
   # Define default file path and name if not provided
-  if (is.null(file)) {
-    file <- paste0(Sys.Date, "_exptType_", "descExp_SD.", file_type)
+  if (is.null(file_name)) {
+    file_name <- paste0(Sys.Date(), "_exptType_", "descExp_SD.", file_type)
+  } else {
+    file_name <- file_name
   }
 
   # Export as file
   if (file_type == "xlsx") {
-    openxlsx::write.xlsx(final_plate, file = file, colNames = FALSE)
+    openxlsx::write.xlsx(final_plate, file = file_name, colNames = FALSE)
   } else if (file_type == "csv") {
-    write.table(final_plate, file = file, sep = ",",
+    write.table(final_plate, file = file_name, sep = ",",
                 row.names = FALSE, col.names = FALSE, na = "")
   }
 }
