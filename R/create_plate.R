@@ -1,4 +1,4 @@
-#' Creates and ELISA plate template
+#' Creates a 96 well ELISA plate template
 #'
 #' @param plate_type An integer that defines the type of microwell plate (default
 #' is 96).
