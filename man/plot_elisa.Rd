@@ -12,6 +12,7 @@ plot_elisa(
   group_by,
   x,
   color,
+  method = c("L4", "line", "na"),
   point_size = 3,
   linewidth = 0.5,
   xlog = FALSE,
@@ -23,10 +24,10 @@ plot_elisa(
 )
 }
 \arguments{
-\item{file}{A character quoted string containing the path to a csv or excel
+\item{file}{A quoted character string containing the path to a csv or excel
 plate file.}
 
-\item{type}{A character quoted string containing the type of elisa. The types
+\item{type}{A quoted character string containing the type of elisa. The types
 are "regular" or "cbt" for checkerboard elisa.}
 
 \item{primary}{An unquoted character string of the main plate name with
@@ -41,6 +42,10 @@ grouping the data.}
 \item{x}{An unquoted character string for the x axis variable for ggplot2::aes.}
 
 \item{color}{An unquoted character string for color in ggplot2::aes.}
+
+\item{method}{A quoted character string containing the method to be used in
+ggplot. "L4" will use drc::L.4 with geom_smooth (default), "line" will use
+geom_line() and "na" will not draw any lines.}
 
 \item{point_size}{A numeric value for size in ggplot2.}
 

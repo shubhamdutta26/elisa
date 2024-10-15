@@ -1,8 +1,8 @@
 #' Plots microplate ELISA data
 #'
-#' @param file A character quoted string containing the path to a csv or excel
+#' @param file A quoted character string containing the path to a csv or excel
 #' plate file.
-#' @param type A character quoted string containing the type of elisa. The types
+#' @param type A quoted character string containing the type of elisa. The types
 #' are "regular" or "cbt" for checkerboard elisa.
 #' @param primary An unquoted character string of the main plate name with
 #' "blanks".
@@ -12,6 +12,9 @@
 #' grouping the data.
 #' @param x An unquoted character string for the x axis variable for ggplot2::aes.
 #' @param color An unquoted character string for color in ggplot2::aes.
+#' @param method A quoted character string containing the method to be used in
+#' ggplot. "L4" will use drc::L.4 with geom_smooth (default), "line" will use
+#' geom_line() and "na" will not draw any lines.
 #' @param point_size A numeric value for size in ggplot2.
 #' @param linewidth A numeric value for linewidth in ggplot2.
 #' @param xlog A logical value that transforms x-axis to log10 (default is FALSE).
@@ -53,6 +56,7 @@ plot_elisa <- function(file,
                        group_by,
                        x,
                        color,
+                       method = c("L4", "line", "na"),
                        point_size = 3,
                        linewidth = 0.5,
                        xlog = FALSE,
@@ -65,6 +69,7 @@ plot_elisa <- function(file,
   raw_data <- tidyplate::tidy_plate(file, ...)
 
   type <- match.arg(type)
+  method <- match.arg(method)
 
   # The primary plate must have the blanks marked
   if(!is.null(filter_data)) {
@@ -106,21 +111,30 @@ plot_elisa <- function(file,
                                        y = mean_od,
                                        group = {{ color }},
                                        color = {{ color }})) +
-    ggplot2::geom_point(size = point_size) +
-    ggplot2::geom_smooth(method = drc::drm,
-                         method.args = list(fct = drc::L.4()),
-                         se = FALSE, linewidth = linewidth)
+    ggplot2::geom_point(size = point_size)
+
+  if(method == "line") {
+    plot <- plot +
+      ggplot2::geom_line()
+  } else if(method == "L4") {
+    plot <- plot +
+      ggplot2::geom_smooth(method = drc::drm,
+                           method.args = list(fct = drc::L.4()),
+                           se = FALSE, linewidth = linewidth)
+  }
 
   # Conditionally add error bars if errorbars = TRUE
   if (errorbars) {
-    plot <- plot + ggplot2::geom_errorbar(ggplot2::aes(ymax = mean_od + mean_sd,
-                                                       ymin = mean_od - mean_sd),
+    plot <- plot +
+      ggplot2::geom_errorbar(ggplot2::aes(ymax = mean_od + mean_sd,
+                                          ymin = mean_od - mean_sd),
                                           width = errorbar_width)
   }
 
   # Conditionally use log scale for x-axis if xlog = TRUE
   if (xlog) {
-    plot <- plot + ggplot2::scale_x_log10()
+    plot <- plot +
+      ggplot2::scale_x_log10()
   }
 
   return(plot)
