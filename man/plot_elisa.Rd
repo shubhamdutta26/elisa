@@ -6,8 +6,9 @@
 \usage{
 plot_elisa(
   file,
+  type = c("regular", "cbt"),
   primary,
-  od,
+  od = od450,
   group_by,
   x,
   color,
@@ -25,14 +26,17 @@ plot_elisa(
 \item{file}{A character quoted string containing the path to a csv or excel
 plate file.}
 
+\item{type}{A character quoted string containing the type of elisa. The types
+are "regular" or "cbt" for checkerboard elisa.}
+
 \item{primary}{An unquoted character string of the main plate name with
 "blanks".}
 
 \item{od}{An unquoted character string of the plate name containing the od
-data.}
+data. By default it will use od450.}
 
 \item{group_by}{An unquoted character vector of the plate name(s) for
-grouping the data}
+grouping the data.}
 
 \item{x}{An unquoted character string for the x axis variable for ggplot2::aes.}
 
@@ -64,8 +68,20 @@ Plots microplate ELISA data
 }
 \examples{
 file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
-plot_elisa(file, primary = primary_mab, od = od450,
-           group_by = c(primary_mab, primary_mab_conc),
-           x = primary_mab_conc, color = primary_mab,
+plot_elisa(file, primary = primary_mab_name, od = od450,
+           group_by = c(primary_mab_conc, primary_mab_name),
+           x = primary_mab_conc, color = primary_mab_name,
            xlog = TRUE, errorbars = TRUE)
+
+file_2 <- system.file("extdata", "elisa_example_2.xlsx", package = "elisa")
+plot_elisa(file_2, primary = coat_protein_name, od = od450,
+           group_by = c(coat_protein_conc, coat_protein_name),
+           x = coat_protein_conc, color = coat_protein_name,
+           xlog = TRUE, errorbars = TRUE)
+
+file_cbt <- system.file("extdata", "cbt_example.xlsx", package = "elisa")
+plot_elisa(file_cbt, type = "cbt", primary = primary_mab_name, od = od450,
+           group_by = c(primary_mab_conc, coat_protein_ug),
+           x = primary_mab_conc, color = coat_protein_ug,
+           xlog = TRUE)
 }

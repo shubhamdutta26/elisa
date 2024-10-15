@@ -2,12 +2,14 @@
 #'
 #' @param file A character quoted string containing the path to a csv or excel
 #' plate file.
+#' @param type A character quoted string containing the type of elisa. The types
+#' are "regular" or "cbt" for checkerboard elisa.
 #' @param primary An unquoted character string of the main plate name with
 #' "blanks".
 #' @param od An unquoted character string of the plate name containing the od
-#' data.
+#' data. By default it will use od450.
 #' @param group_by An unquoted character vector of the plate name(s) for
-#' grouping the data
+#' grouping the data.
 #' @param x An unquoted character string for the x axis variable for ggplot2::aes.
 #' @param color An unquoted character string for color in ggplot2::aes.
 #' @param point_size A numeric value for size in ggplot2.
@@ -24,16 +26,30 @@
 #' @return A ggplot2 object
 #' @export
 #' @importFrom stats sd
+#' @importFrom rlang :=
 #'
 #' @examples
 #' file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
-#' plot_elisa(file, primary = primary_mab, od = od450,
-#'            group_by = c(primary_mab, primary_mab_conc),
-#'            x = primary_mab_conc, color = primary_mab,
+#' plot_elisa(file, primary = primary_mab_name, od = od450,
+#'            group_by = c(primary_mab_conc, primary_mab_name),
+#'            x = primary_mab_conc, color = primary_mab_name,
 #'            xlog = TRUE, errorbars = TRUE)
+#'
+#' file_2 <- system.file("extdata", "elisa_example_2.xlsx", package = "elisa")
+#' plot_elisa(file_2, primary = coat_protein_name, od = od450,
+#'            group_by = c(coat_protein_conc, coat_protein_name),
+#'            x = coat_protein_conc, color = coat_protein_name,
+#'            xlog = TRUE, errorbars = TRUE)
+#'
+#' file_cbt <- system.file("extdata", "cbt_example.xlsx", package = "elisa")
+#' plot_elisa(file_cbt, type = "cbt", primary = primary_mab_name, od = od450,
+#'            group_by = c(primary_mab_conc, coat_protein_ug),
+#'            x = primary_mab_conc, color = coat_protein_ug,
+#'            xlog = TRUE)
 plot_elisa <- function(file,
+                       type = c("regular", "cbt"),
                        primary,
-                       od,
+                       od = od450,
                        group_by,
                        x,
                        color,
@@ -48,7 +64,9 @@ plot_elisa <- function(file,
 
   raw_data <- tidyplate::tidy_plate(file, ...)
 
-  # If needed, filter out specific primary conditions
+  type <- match.arg(type)
+
+  # The primary plate must have the blanks marked
   if(!is.null(filter_data)) {
     raw_data_filtered <- raw_data |>
       dplyr::filter(!({{ filter_col }} %in% filter_data))
@@ -73,6 +91,14 @@ plot_elisa <- function(file,
       mean_sd = sd(blanked_od, na.rm = TRUE),
       .groups = 'drop'  # Add this to avoid grouping issues
     )
+
+  if (type == "cbt") {
+    summary <- summary |>
+      dplyr::filter({{ color }} != 0) |>
+      dplyr::mutate({{ color }} := round({{ color }}, 5)) |>
+      dplyr::mutate({{ color }} := forcats::as_factor({{ color }})) |>
+      dplyr::mutate({{ color }} := forcats::fct_rev({{ color }}))
+  }
 
   # Plotting
   plot <- ggplot2::ggplot(summary,
