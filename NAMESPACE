@@ -2,5 +2,6 @@
 
 export(create_plate)
 export(plot_elisa)
+importFrom(rlang,":=")
 importFrom(stats,sd)
 importFrom(utils,write.table)
