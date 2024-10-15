@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_plate.R
 \name{create_plate}
 \alias{create_plate}
-\title{Creates and ELISA plate template}
+\title{Creates a 96 well ELISA plate template}
 \usage{
 create_plate(
   plate_type = 96,
@@ -30,7 +30,7 @@ xlsx)}
 A xlsx or csv file (default is xlsx)
 }
 \description{
-Creates and ELISA plate template
+Creates a 96 well ELISA plate template
 }
 \examples{
 \dontrun{
