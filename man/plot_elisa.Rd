@@ -8,8 +8,8 @@ plot_elisa(
   file,
   type = c("regular", "cbt"),
   primary,
-  od = od450,
-  group_by,
+  od = "od450",
+  group_by = NULL,
   x,
   color,
   method = c("L4", "line", "na"),
@@ -24,26 +24,26 @@ plot_elisa(
 )
 }
 \arguments{
-\item{file}{A quoted character string containing the path to a csv or excel
+\item{file}{A character string containing the path to a csv or excel
 plate file.}
 
-\item{type}{A quoted character string containing the type of elisa. The types
+\item{type}{A character string containing the type of elisa. The types
 are "regular" or "cbt" for checkerboard elisa.}
 
-\item{primary}{An unquoted character string of the main plate name with
+\item{primary}{An character string of the main plate name with
 "blanks".}
 
-\item{od}{An unquoted character string of the plate name containing the od
-data. By default it will use od450.}
+\item{od}{An character string of the plate name containing the od
+data. By default it will use "od450."}
 
-\item{group_by}{An unquoted character vector of the plate name(s) for
+\item{group_by}{An character vector of the plate name(s) for
 grouping the data.}
 
-\item{x}{An unquoted character string for the x axis variable for ggplot2::aes.}
+\item{x}{An character string for the x axis variable for ggplot2::aes.}
 
-\item{color}{An unquoted character string for color in ggplot2::aes.}
+\item{color}{An character string for color in ggplot2::aes.}
 
-\item{method}{A quoted character string containing the method to be used in
+\item{method}{A character string containing the method to be used in
 ggplot. "L4" will use drc::L.4 with geom_smooth (default), "line" will use
 geom_line() and "na" will not draw any lines.}
 
@@ -57,10 +57,10 @@ geom_line() and "na" will not draw any lines.}
 
 \item{errorbar_width}{A numeric value for errorbar width in ggplot2.}
 
-\item{filter_col}{An unquoted character string to select plate name on which
+\item{filter_col}{character string to select plate name on which
 the dplyr::filter will be used.}
 
-\item{filter_data}{An quoted character vector that needs to be filtered out
+\item{filter_data}{An character vector that needs to be filtered out
 from `filter_col` using the dplyr::filter function.}
 
 \item{...}{Any other arguments from tidyplate::tidy_plate function}
@@ -73,20 +73,28 @@ Plots microplate ELISA data
 }
 \examples{
 file <- system.file("extdata", "elisa_example.xlsx", package = "elisa")
-plot_elisa(file, primary = primary_mab_name, od = od450,
-           group_by = c(primary_mab_conc, primary_mab_name),
-           x = primary_mab_conc, color = primary_mab_name,
+plot_elisa(file, primary = "primary_mab_name",
+           group_by = c("primary_mab_conc", "primary_mab_name"),
+           x = "primary_mab_conc", color = "primary_mab_name",
+           xlog = TRUE, errorbars = TRUE)
+plot_elisa(file, primary = "primary_mab_name", od = "od450",
+           x = "primary_mab_conc", color = "primary_mab_name",
            xlog = TRUE, errorbars = TRUE)
 
 file_2 <- system.file("extdata", "elisa_example_2.xlsx", package = "elisa")
-plot_elisa(file_2, primary = coat_protein_name, od = od450,
-           group_by = c(coat_protein_conc, coat_protein_name),
-           x = coat_protein_conc, color = coat_protein_name,
+plot_elisa(file_2, primary = "coat_protein_name",
+           group_by = c("coat_protein_conc", "coat_protein_name"),
+           x = "coat_protein_conc", color = "coat_protein_name",
+           xlog = TRUE, errorbars = TRUE)
+plot_elisa(file_2, primary = "coat_protein_name", od = "od450",
+           x = "coat_protein_conc", color = "coat_protein_name",
            xlog = TRUE, errorbars = TRUE)
 
 file_cbt <- system.file("extdata", "cbt_example.xlsx", package = "elisa")
-plot_elisa(file_cbt, type = "cbt", primary = primary_mab_name, od = od450,
-           group_by = c(primary_mab_conc, coat_protein_ug),
-           x = primary_mab_conc, color = coat_protein_ug,
+plot_elisa(file_cbt, type = "cbt", primary = "primary_mab_name",
+           group_by = c("primary_mab_conc", "coat_protein_ug"),
+           x = "primary_mab_conc", color = "coat_protein_ug",
            xlog = TRUE)
+plot_elisa(file_cbt, type = "cbt", primary = "primary_mab_name",
+           x = "primary_mab_conc", color = "coat_protein_ug", xlog = TRUE)
 }
