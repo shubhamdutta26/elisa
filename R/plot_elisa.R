@@ -17,8 +17,8 @@
 #' "blanks". If using default names (using create_plate()) this argument may
 #' remain NULL.
 #' @param od An character string of the plate name containing the od
-#' data. By default it will use "od450."  If using default names (using create_plate()) this argument may
-#' remain NULL.
+#' data. By default it will use "od450."  If using default names (using create_plate())
+#' this argument may remain NULL.
 #' @param group_by An character vector of the plate name(s) for
 #' grouping the data. If using default names (using create_plate()) this argument may
 #' remain NULL.
