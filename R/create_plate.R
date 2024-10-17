@@ -18,7 +18,7 @@
 #' create_plate()
 #' }
 create_plate <- function(plate_type = 96,
-                         n_plates = 19,
+                         n_plates = 21,
                          plate_names = NULL,
                          file_type = c("xlsx", "csv"),
                          file_name = NULL) {
@@ -35,13 +35,13 @@ create_plate <- function(plate_type = 96,
   }
 
   if (is.null(plate_names)) {
-    plate_names <- c("coat_protein_name", "coat_protein_ug", "coat_protein_vendor",
-                     "coat_protein_cat", "coat_protein_lot", "coat_protein_source",
-                     "primary_mab_name", "primary_mab_conc", "primary_mab_vendor",
-                     "primary_mab_cat", "primary_mab_lot", "primary_mab_source",
-                     "detection_mab_name", "detection_mab_dil", "detection_mab_vendor",
-                     "detection_mab_cat", "detection_mab_lot", "detection_mab_source",
-                     "od450")
+    plate_names <- c("coat_protein_name", "coat_protein_clone", "coat_protein_ug",
+                     "coat_protein_vendor", "coat_protein_cat", "coat_protein_lot",
+                     "coat_protein_source", "primary_mab_name", "primary_mab_clone",
+                     "primary_mab_conc", "primary_mab_vendor", "primary_mab_cat",
+                     "primary_mab_lot", "primary_mab_source", "detection_mab_name",
+                     "detection_mab_dil", "detection_mab_vendor", "detection_mab_cat",
+                     "detection_mab_lot", "detection_mab_source", "od450")
   } else {
     plate_names <- plate_names
   }
