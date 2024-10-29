@@ -6,7 +6,7 @@
 \usage{
 create_plate(
   plate_type = 96,
-  n_plates = 19,
+  n_plates = 21,
   plate_names = NULL,
   file_type = c("xlsx", "csv"),
   file_name = NULL
