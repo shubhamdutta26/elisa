@@ -1,0 +1,20 @@
+Dose Response Regression
+
+Best-fit Values
+,IC50,IC50 - 95% CI,Log IC50,Log IC50 - 95% CI
+Drug_A,9.6802,8.5208 to 11.4846,0.9859,0.9305 to 1.0601
+Drug_B,11.0730,9.7942 to 12.9895,1.0443,0.99010 to 1.1136
+Drug_C,9.2331,8.4988 to 10.2129,0.9653,0.9294 to 1.0092
+
+Response Curve Fitting Coefficients
+,Top,Bottom,Hill Slope
+Drug_A,89.4890,11.2169,-1.2496
+Drug_B,91.1226,6.8709,-1.1327
+Drug_C,88.2817,12.9601,-1.4250
+
+Goodness of Fit
+,Degrees of Freedom,Residual Standard Error,Sum of Squares,R-squared
+Drug_A,17,2.0539,71.7145,0.9960
+Drug_B,17,1.6196,44.5945,0.9977
+Drug_C,17,1.5656,41.6693,0.9977
+

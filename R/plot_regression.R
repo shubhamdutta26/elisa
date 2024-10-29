@@ -1,7 +1,7 @@
 plot_regression <- function(
     data = NULL,
     file_path = NULL,
-    treatment,
+    group,
     dose,
     response,
     curve_type = c("linear", "dose_response"),
@@ -34,8 +34,8 @@ plot_regression <- function(
   dose_response_model <- rlang::arg_match(dose_response_model)
 
   # Generate base plot
-  p <- ggplot2::ggplot(data, ggplot2::aes_string(x = dose, y = response, color = treatment)) +
-    ggplot2::labs(x = dose, y = response, color = treatment)
+  p <- ggplot2::ggplot(data, ggplot2::aes_string(x = dose, y = response, color = group)) +
+    ggplot2::labs(x = dose, y = response, color = group)
 
   if (curve_type == "linear") {
     p <- p + ggplot2::geom_point() +
@@ -49,8 +49,8 @@ plot_regression <- function(
       rlang::abort("Unsupported dose-response model.")
     )
 
-    # Apply dose-response model for each level of treatment
-    fit_list <- split(data, data[[treatment]]) %>%
+    # Apply dose-response model for each level of group
+    fit_list <- split(data, data[[group]]) %>%
       lapply(function(subdata) {
         drc::drm(as.formula(paste(response, "~", dose)), data = subdata, fct = model_func)
       })
@@ -68,10 +68,10 @@ plot_regression <- function(
       }
 
       data_fit$y <- predict(fit_list[[level]], newdata = data_fit)
-      data_fit[[treatment]] <- level
+      data_fit[[group]] <- level
 
       p <- p + ggplot2::geom_line(data = data_fit,
-                                  ggplot2::aes(x = x, y = y, color = !!rlang::sym(treatment)),
+                                  ggplot2::aes(x = x, y = y, color = !!rlang::sym(group)),
                                   inherit.aes = FALSE)
     }
 
@@ -85,7 +85,7 @@ plot_regression <- function(
 
   # Add faceting if specified
   if (facet) {
-    p <- p + ggplot2::facet_wrap(as.formula(paste("~", treatment)))
+    p <- p + ggplot2::facet_wrap(as.formula(paste("~", group)))
   }
 
   # Add additional layers specified in ...

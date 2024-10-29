@@ -1,63 +1,70 @@
-analyse_regression <- function(
+stat_regression <- function(
     file = NULL,
     data = NULL,
-    treatment,
+    group,
     dose,
     response,
-    regression_model = c("linear", "dose response"),
+    regression_model = c("linear", "dose_response"),
     dose_response_type = c("stimulation", "inhibition"),
-    xlog = TRUE
+    doseLog = TRUE
 ) {
   # Read data
-  if (!is.null(file)) {
+  if (!is.null(file) && is.character(file) && length(file) == 1) {
     if (tools::file_ext(file) == "csv") {
       raw_data <- suppressMessages(readr::read_csv(file))
     } else if (tools::file_ext(file) %in% c("xls", "xlsx")) {
       raw_data <- suppressMessages(readxl::read_excel(file))
     } else {
-      stop("File type not supported. Use csv, xls, or xlsx.")
+      rlang::abort("File type not supported. Use csv, xls, or xlsx files.", call = NULL)
     }
-  } else {
+  } else if (is.data.frame(data)) {
     raw_data <- data
+  } else {
+    rlang::abort("Input data must be a file path or a dataframe/tibble.", call = NULL)
   }
 
   regression_model <- rlang::arg_match(regression_model)
   dose_response_type <- rlang::arg_match(dose_response_type)
 
-  unique_treatments <- unique(raw_data[[treatment]])
+  # Set labels based on dose-response type
+  ec50_label <- if (dose_response_type == "inhibition") "IC50" else "EC50"
+  logec50_label <- if (dose_response_type == "inhibition") "LogIC50" else "LogEC50"
+
+  unique_groups <- unique(raw_data[[group]])
 
   # Initialize lists for results
-  final_list <- list(
-    BestFitValues = tibble::tibble(),
-    Coefficients = tibble::tibble(),
-    GoodnessOfFit = tibble::tibble(),
-    StatisticalSignificance = tibble::tibble(),
-    InteractionSignificance = tibble::tibble()
-  )
+  if (regression_model == "linear") {
+    final_list <- list(
+      BestFitValues = tibble::tibble(),
+      Coefficients = tibble::tibble(),
+      GoodnessOfFit = tibble::tibble(),
+      StatisticalSignificance = tibble::tibble(),
+      InteractionSignificance = tibble::tibble()
+    )
+  } else if (regression_model == "dose_response") {
+    final_list <- list(
+      BestFitValues = tibble::tibble(),
+      Coefficients = tibble::tibble(),
+      GoodnessOfFit = tibble::tibble()
+    )
+  }
 
-  # Iterate over each unique treatment for analysis
-  for (each_treatment in unique_treatments) {
-    each_data <- dplyr::filter(raw_data, .data[[treatment]] == each_treatment)
+  # Iterate over each unique group for analysis
+  for (each_group in unique_groups) {
+    each_data <- dplyr::filter(raw_data, .data[[group]] == each_group)
 
-    if (regression_model == "dose response") {
+    if (regression_model == "dose_response") {
       # Prepare start values for nls fitting
       start_vals <- list(
         bottom = min(each_data[[response]], na.rm = TRUE),
         top = max(each_data[[response]], na.rm = TRUE),
         logEC50 = log10(median(each_data[[dose]], na.rm = TRUE)),
-        hill_slope = 1
+        hill_slope = ifelse(dose_response_type == "stimulation", 1, -1)
       )
 
-      # Select the formula based on the dose response type
-      if (dose_response_type == "stimulation") {
-        formula <- as.formula(
-          paste(response, "~ bottom + (top - bottom) / (1 + 10^((logEC50 - log10(", dose, ")) * hill_slope))")
-        )
-      } else if (dose_response_type == "inhibition") {
-        formula <- as.formula(
-          paste(response, "~ top - (top - bottom) / (1 + 10^((logEC50 - log10(", dose, ")) * hill_slope))")
-        )
-      }
+      formula <- as.formula(
+        paste(response, "~ bottom + (top - bottom) / (1 + 10^((logEC50 - log10(", dose, ")) * hill_slope))")
+      )
 
       # Fit the model
       fit <- tryCatch(
@@ -69,7 +76,7 @@ analyse_regression <- function(
       if (is.null(fit)) next
 
       # Best fit values for dose-response
-      ec50 <- 10^coef(fit)["logEC50"]
+      ec50 <- unname(10^coef(fit)["logEC50"])
       confint_vals <- confint(fit, level = 0.95)
       ec50_conf <- paste0(round(10^confint_vals["logEC50", ], 5), collapse = " to ")
       logec50_conf <- paste0(round(confint_vals["logEC50", ], 5), collapse = " to ")
@@ -77,11 +84,11 @@ analyse_regression <- function(
       final_list$BestFitValues <- dplyr::bind_rows(
         final_list$BestFitValues,
         tibble::tibble(
-          Name = each_treatment,
-          EC50 = round(ec50, 5),
-          EC50_CI = ec50_conf,
-          LogEC50 = round(coef(fit)["logEC50"], 5),
-          LogEC50_CI = logec50_conf
+          Name = each_group,
+          !!rlang::sym(ec50_label) := round(ec50, 5),
+          !!rlang::sym(paste0(ec50_label, " - 95% CI")) := ec50_conf,
+          !!rlang::sym(logec50_label) := unname(round(coef(fit)["logEC50"], 5)),
+          !!rlang::sym(paste0(logec50_label, " - 95% CI")) := logec50_conf
         )
       )
 
@@ -89,10 +96,10 @@ analyse_regression <- function(
       final_list$Coefficients <- dplyr::bind_rows(
         final_list$Coefficients,
         tibble::tibble(
-          Name = each_treatment,
-          Top = round(coef(fit)["top"], 5),
-          Bottom = round(coef(fit)["bottom"], 5),
-          HillSlope = round(coef(fit)["hill_slope"], 5)
+          Name = each_group,
+          Top = unname(round(coef(fit)["top"], 5)),
+          Bottom = unname(round(coef(fit)["bottom"], 5)),
+          `Hill slope` = unname(round(coef(fit)["hill_slope"], 5))
         )
       )
 
@@ -105,14 +112,13 @@ analyse_regression <- function(
       final_list$GoodnessOfFit <- dplyr::bind_rows(
         final_list$GoodnessOfFit,
         tibble::tibble(
-          Name = each_treatment,
-          DF = df.residual(fit),
-          RSE = round(sigma(fit), 5),
-          Sum_of_Squares = round(ss_res, 5),
-          R_Squared = round(r_squared, 5)
+          Name = each_group,
+          `Degrees of Freedom` = df.residual(fit),
+          `Residual Standard Error` = round(sigma(fit), 5),
+          `Sum of Squares` = round(ss_res, 5),
+          `R-Squared` = round(r_squared, 5)
         )
       )
-
     } else if (regression_model == "linear") {
       # Linear regression analysis
       lm_formula <- as.formula(paste(response, "~", dose))
@@ -141,7 +147,7 @@ analyse_regression <- function(
         final_list$BestFitValues <- dplyr::bind_rows(
           final_list$BestFitValues,
           tibble::tibble(
-            Name = each_treatment,
+            Name = each_group,
             Equation = paste("Y =", round(slope, 5), "X +", round(intercept, 5)),
             Slope = round(slope, 5),
             Slope_SE = round(slope_se, 5),
@@ -157,7 +163,7 @@ analyse_regression <- function(
         final_list$GoodnessOfFit <- dplyr::bind_rows(
           final_list$GoodnessOfFit,
           tibble::tibble(
-            Name = each_treatment,
+            Name = each_group,
             R_Squared_LM = round(r_squared_lm, 5),
             Sy_x = round(sy_x, 5)
           )
@@ -177,7 +183,7 @@ analyse_regression <- function(
         final_list$StatisticalSignificance <- dplyr::bind_rows(
           final_list$StatisticalSignificance,
           tibble::tibble(
-            Name = each_treatment,
+            Name = each_group,
             F_Statistic = round(f_stat, 4),
             Dfn = dfn,
             Dfd = dfd,
@@ -185,51 +191,50 @@ analyse_regression <- function(
             p_value_stars = p_stars
           )
         )
+
+        # Pairwise interaction analysis
+        drug_combinations <- combn(unique_groups, 2, simplify = FALSE)
+        for (drug_pair in drug_combinations) {
+          pair_data <- raw_data %>% dplyr::filter(.data[[group]] %in% drug_pair)
+
+          # Convert group to a factor to enable interaction term
+          pair_data[[group]] <- factor(pair_data[[group]], levels = drug_pair)
+
+          # Interaction model with group and dose
+          interaction_formula <- as.formula(paste(response, "~", group, "*", dose))
+          interaction_fit <- tryCatch(
+            lm(interaction_formula, data = pair_data),
+            error = function(e) NULL
+          )
+
+          if (!is.null(interaction_fit)) {
+            anova_interaction <- anova(interaction_fit)
+
+            # Get interaction term significance
+            interaction_f_stat <- anova_interaction$`F value`[3]  # Interaction term
+            interaction_dfn <- anova_interaction$Df[3]
+            interaction_dfd <- anova_interaction$Df[4]
+            interaction_p_val <- anova_interaction$`Pr(>F)`[3]
+
+            # Adding significance stars based on p-value
+            interaction_p_stars <- ifelse(interaction_p_val < 0.05, "*", "ns")
+
+            # Store interaction significance results
+            final_list$InteractionSignificance <- dplyr::bind_rows(
+              final_list$InteractionSignificance,
+              tibble::tibble(
+                Drug_Pair = paste(drug_pair, collapse = " & "),
+                Interaction_F_Statistic = round(interaction_f_stat, 4),
+                Dfn = interaction_dfn,
+                Dfd = interaction_dfd,
+                Interaction_p_value = round(interaction_p_val, 4),
+                p_value_stars = interaction_p_stars
+              )
+            )
+          }
+        }
       }
     }
   }
-
-  # Pairwise interaction analysis
-  drug_combinations <- combn(unique_treatments, 2, simplify = FALSE)
-  for (drug_pair in drug_combinations) {
-    pair_data <- raw_data %>% dplyr::filter(.data[[treatment]] %in% drug_pair)
-
-    # Convert treatment to a factor to enable interaction term
-    pair_data[[treatment]] <- factor(pair_data[[treatment]], levels = drug_pair)
-
-    # Interaction model with treatment and dose
-    interaction_formula <- as.formula(paste(response, "~", treatment, "*", dose))
-    interaction_fit <- tryCatch(
-      lm(interaction_formula, data = pair_data),
-      error = function(e) NULL
-    )
-
-    if (!is.null(interaction_fit)) {
-      anova_interaction <- anova(interaction_fit)
-
-      # Get interaction term significance
-      interaction_f_stat <- anova_interaction$`F value`[3]  # Interaction term
-      interaction_dfn <- anova_interaction$Df[3]
-      interaction_dfd <- anova_interaction$Df[4]
-      interaction_p_val <- anova_interaction$`Pr(>F)`[3]
-
-      # Adding significance stars based on p-value
-      interaction_p_stars <- ifelse(interaction_p_val < 0.05, "*", "ns")
-
-      # Store interaction significance results
-      final_list$InteractionSignificance <- dplyr::bind_rows(
-        final_list$InteractionSignificance,
-        tibble::tibble(
-          Drug_Pair = paste(drug_pair, collapse = " & "),
-          Interaction_F_Statistic = round(interaction_f_stat, 4),
-          Dfn = interaction_dfn,
-          Dfd = interaction_dfd,
-          Interaction_p_value = round(interaction_p_val, 4),
-          p_value_stars = interaction_p_stars
-        )
-      )
-    }
-  }
-
   return(final_list)
 }

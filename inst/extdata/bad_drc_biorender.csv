@@ -1,0 +1,20 @@
+Dose Response Regression
+
+Best-fit Values
+,EC50,EC50 - 95% CI,Log EC50,Log EC50 - 95% CI
+aBACE,0.1344,0.09726 to 0.1824,-0.8715,-1.0121 to -0.73810
+aSARS,0.1371,0.1068 to 0.1742,-0.86210,-0.9714 to -0.7591
+Compound B,NA,NA to NA,NA,NA to NA
+
+Response Curve Fitting Coefficients
+,Top,Bottom,Hill Slope
+aBACE,1.3332,0.1793,1.0585
+aSARS,1.3099,0.1683,1.1169
+Compound B,NA,NA,NA
+
+Goodness of Fit
+,Degrees of Freedom,Residual Standard Error,Sum of Squares,R-squared
+aBACE,17,0.06741,0.07724,0.9823
+aSARS,17,0.05543,0.05224,0.9881
+Compound B,NA,NA,NA,NA
+
