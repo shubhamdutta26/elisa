@@ -225,7 +225,7 @@ stat_regression <- function(
         }
       }
     }, warning = function(e) {
-      rlang::warn(paste("Warning: Group", each_group, "could not be processed due to model fitting issues."),
+      rlang::warn(paste(each_group, "could not be processed due to model fitting issues."),
                   call = NULL)})
   }
 
