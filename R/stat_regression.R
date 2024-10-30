@@ -1,3 +1,23 @@
+#' User friendly statistical output of linear and dose response regression.
+#'
+#' @param file An excel or csv file path containing data to be fitted in a tidy format.
+#' @param data A dataframe or tibble of data to be fitted.
+#' @param group The column containing the different categories in the data or file.
+#' @param dose The column in the data or file that will be used in the RHS.
+#' @param response The column in the data or file that will be used in the LHS.
+#' @param regression_model The regression model; either "linear" or "dose_response".
+#' The default is "linear".
+#' @param dose_response_type If `regression_model` is "dose_response" then specify
+#' whether the response is stimulatory ("stimulation") or inhibitory ("inhibition").
+#' The default is "stimulation".
+#' @param doseLog A logical value of whether the `dose` of the input data is log10
+#' transformed or not. If data is log10 transformed then the value should be
+#' TRUE otherwise FALSE. The default is TRUE.
+#'
+#' @return A list of tibbles containing statistical parameters of the fitted data.
+#' @export
+#'
+#' @examples
 stat_regression <- function(
     file = NULL,
     data = NULL,

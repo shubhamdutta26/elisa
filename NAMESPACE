@@ -3,10 +3,11 @@
 export("%>%")
 export(create_plate)
 export(plot_elisa)
+export(stat_regression)
 importFrom(magrittr,"%>%")
 importFrom(rlang,":=")
 importFrom(stats,sd)
 importFrom(utils,write.table)
 importFrom("stats", "anova", "as.formula", "coef", "confint",
-               "df.residual", "lm", "median", "nls", "predict", "sigma")
+           "df.residual", "lm", "median", "nls", "predict", "sigma")
 importFrom("utils", "combn")
