@@ -45,6 +45,7 @@ stat_regression <- function(
     # Wrap model fitting in tryCatch to handle errors
     result <- tryCatch({
       if (regression_model == "dose_response") {
+
         # Prepare start values for nls fitting
         start_vals <- list(
           bottom = min(each_data[[response]], na.rm = TRUE),
@@ -53,12 +54,22 @@ stat_regression <- function(
           hill_slope = ifelse(dose_response_type == "stimulation", 1, -1)
         )
 
+        # Define formula with dose transformation
+        dose_expr <- if (doseLog) "" else "log10("
+        dose_expr <- paste0(dose_expr, dose, if (doseLog) "" else ")")
+
         formula <- as.formula(
-          paste(response, "~ bottom + (top - bottom) / (1 + 10^((logEC50 - log10(", dose, ")) * hill_slope))")
+          paste(response, "~ bottom + (top - bottom) / (1 + 10^((logEC50 -", dose_expr, ") * hill_slope))")
         )
 
         # Fit the model
-        fit <- suppressWarnings(nls(formula, data = each_data, start = start_vals))
+        fit <- tryCatch({
+          nls(formula, data = each_data, start = start_vals)
+        }, error = function(e) {
+          rlang::abort(
+            c("The data could not be processed due to model fitting issues.",
+              "i" = "Check if you set `logDose = TRUE` when the dose column is not log10 transformed."),
+          call = NULL)})
 
         coef_fit <- coef(fit)
 
@@ -109,10 +120,7 @@ stat_regression <- function(
       } else if (regression_model == "linear") {
         # Linear regression analysis
         lm_formula <- as.formula(paste(response, "~", dose))
-        lm_fit <- tryCatch(
-          suppressWarnings(lm(lm_formula, data = each_data)),
-          error = function(e) NULL
-        )
+        lm_fit <- suppressWarnings(lm(lm_formula, data = each_data))
 
         if (!is.null(lm_fit)) {
           lm_summary <- summary(lm_fit)
@@ -225,7 +233,7 @@ stat_regression <- function(
         }
       }
     }, warning = function(e) {
-      rlang::warn(paste(each_group, "could not be processed due to model fitting issues."),
+       rlang::warn(paste(each_group, "could not be processed due to model fitting issues."),
                   call = NULL)})
   }
 
