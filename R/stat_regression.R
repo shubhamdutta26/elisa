@@ -3,7 +3,8 @@
 #' @param file An excel or csv file path containing data to be fitted in a tidy format.
 #' @param data A dataframe or tibble of data to be fitted.
 #' @param group The column containing the different categories in the data or file.
-#' @param dose The column in the data or file that will be used in the RHS.
+#' @param dose The column in the data or file that will be used in the RHS.  If
+#' it is log10 transformed `doseLog` argument should be FALSE.
 #' @param response The column in the data or file that will be used in the LHS.
 #' @param regression_model The regression model; either "linear" or "dose_response".
 #' The default is "linear".
@@ -12,10 +13,13 @@
 #' The default is "stimulation".
 #' @param doseLog A logical value of whether the `dose` of the input data is log10
 #' transformed or not. If data is log10 transformed then the value should be
-#' TRUE otherwise FALSE. The default is TRUE.
+#' TRUE otherwise FALSE. The default is FALSE.
 #'
 #' @return A list of tibbles containing statistical parameters of the fitted data.
 #' @export
+#'
+#' @importFrom stats anova as.formula coef confint df.residual lm median nls predict sigma
+#' @importFrom utils combn
 #'
 #' @examples
 stat_regression <- function(
@@ -26,7 +30,7 @@ stat_regression <- function(
     response,
     regression_model = c("linear", "dose_response"),
     dose_response_type = c("stimulation", "inhibition"),
-    doseLog = TRUE
+    doseLog = FALSE
 ) {
   # Read data
   if (!is.null(file) && is.character(file) && length(file) == 1) {
@@ -54,7 +58,6 @@ stat_regression <- function(
 
   final_list <- list(
       BestFitValues = tibble::tibble(),
-      Coefficients = tibble::tibble(),
       GoodnessOfFit = tibble::tibble()
     )
 
@@ -234,7 +237,13 @@ stat_regression <- function(
               interaction_p_val <- anova_interaction$`Pr(>F)`[3]
 
               # Adding significance stars based on p-value
-              interaction_p_stars <- ifelse(interaction_p_val < 0.05, "*", "ns")
+              interaction_p_stars <- dplyr::case_when(
+                interaction_p_val > 0.05 ~ "ns",
+                interaction_p_val <= 0.05 ~ "*",
+                interaction_p_val <= 0.01 ~ "**",
+                interaction_p_val <= 0.001 ~ "***",
+                interaction_p_val <= 0.0001 ~ "****"
+              )
 
               # Store interaction significance results
               final_list$InteractionSignificance <- dplyr::bind_rows(
@@ -253,7 +262,7 @@ stat_regression <- function(
         }
       }
     }, warning = function(e) {
-       rlang::warn(paste(each_group, "could not be processed due to model fitting issues."),
+       rlang::warn(paste0("'", each_group, "'", " could not be processed due to model fitting issues."),
                   call = NULL)})
   }
 

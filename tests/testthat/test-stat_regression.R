@@ -23,18 +23,18 @@ test_that("stat_regression displays correct statistical information", {
       LogEC50 = c(-0.8715, -0.86298),
       `LogEC50 - 95% CI` = c("-1.01213 to -0.73896", "-0.97139 to -0.75908")
     ),
-    Coefficients = tibble::tibble(
-      Name = c("aBACE", "aSARS"),
-      Top = c(1.33321, 1.30986),
-      Bottom = c(0.17931, 0.16828),
-      `Hill slope` = c(1.05846, 1.11686)
-    ),
     GoodnessOfFit = tibble::tibble(
       Name = c("aBACE", "aSARS"),
       `Degrees of Freedom` = as.integer(c(17, 17)),
       `Residual Standard Error` = c(0.06741, 0.05543),
       `Sum of Squares` = c(0.07724, 0.05224),
       `R-Squared` = c(0.98232, 0.98809)
+    ),
+    Coefficients = tibble::tibble(
+      Name = c("aBACE", "aSARS"),
+      Top = c(1.33321, 1.30986),
+      Bottom = c(0.17931, 0.16828),
+      `Hill slope` = c(1.05846, 1.11686)
     )
   )
 
@@ -59,18 +59,18 @@ test_that("stat_regression displays correct statistical information", {
       LogIC50 = c(0.98589, 1.04426, 0.96535),
       `LogIC50 - 95% CI` = c("0.93047 to 1.06011", "0.99096 to 1.11358", "0.92935 to 1.00915")
     ),
-    Coefficients = tibble::tibble(
-      Name = c("Drug_A", "Drug_B", "Drug_C"),
-      Top = c(89.48905, 91.12258, 88.28172),
-      Bottom = c(11.21693, 6.87087, 12.96007),
-      `Hill slope` = c(-1.24957, -1.13270, -1.42501)
-    ),
     GoodnessOfFit = tibble::tibble(
       Name = c("Drug_A", "Drug_B", "Drug_C"),
       `Degrees of Freedom` = as.integer(c(17, 17, 17)),
       `Residual Standard Error` = c(2.0539, 1.61963, 1.56561),
       `Sum of Squares` = c(71.71452, 44.5945, 41.66933),
       `R-Squared` = c(0.99602, 0.99767, 0.99768)
+    ),
+    Coefficients = tibble::tibble(
+      Name = c("Drug_A", "Drug_B", "Drug_C"),
+      Top = c(89.48905, 91.12258, 88.28172),
+      Bottom = c(11.21693, 6.87087, 12.96007),
+      `Hill slope` = c(-1.24957, -1.13270, -1.42501)
     )
   )
 
@@ -95,18 +95,18 @@ test_that("stat_regression displays correct statistical information", {
       LogEC50 = c(-0.87150, -0.86298),
       `LogEC50 - 95% CI` = c("-1.01213 to -0.73896", "-0.97139 to -0.75908")
     ),
-    Coefficients = tibble::tibble(
-      Name = c("aBACE", "aSARS"),
-      Top = c(1.33321, 1.30986),
-      Bottom = c(0.17931, 0.16828),
-      `Hill slope` = c(1.05846, 1.11686)
-    ),
     GoodnessOfFit = tibble::tibble(
       Name = c("aBACE", "aSARS"),
       `Degrees of Freedom` = as.integer(c(17, 17)),
       `Residual Standard Error` = c(0.06741, 0.05543),
       `Sum of Squares` = c(0.07724, 0.05224),
       `R-Squared` = c(0.98232, 0.98809)
+    ),
+    Coefficients = tibble::tibble(
+      Name = c("aBACE", "aSARS"),
+      Top = c(1.33321, 1.30986),
+      Bottom = c(0.17931, 0.16828),
+      `Hill slope` = c(1.05846, 1.11686)
     )
   )
 
@@ -125,7 +125,6 @@ test_that("stat_regression displays correct statistical information", {
   # all faulty data biorender values
   all_faulty_expected <- list(
     BestFitValues = tibble::tibble(),
-    Coefficients = tibble::tibble(),
     GoodnessOfFit = tibble::tibble()
   )
 
