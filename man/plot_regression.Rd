@@ -12,7 +12,7 @@ plot_regression(
   response,
   regression_model = c("linear", "dose_response"),
   dose_response_type = c("stimulation", "inhibition"),
-  doseLog = FALSE,
+  xLog = FALSE,
   facet = FALSE,
   ...
 )
@@ -25,7 +25,7 @@ plot_regression(
 \item{group}{The column containing the different categories in the data or file.}
 
 \item{dose}{The column in the data or file that will be used in plotting
-the X axis. If it is log10 transformed `doseLog` argument should be FALSE.}
+the X axis. If it is log10 transformed `xLog` argument should be FALSE.}
 
 \item{response}{The column in the data or file that will be used in plotting
 the Y axis.}
@@ -37,9 +37,8 @@ The default is "linear".}
 whether the response is stimulatory ("stimulation") or inhibitory ("inhibition").
 The default is "stimulation".}
 
-\item{doseLog}{A logical value of whether the `dose` of the input data is log10
-transformed or not. If data is log10 transformed then the value should be
-TRUE otherwise FALSE. The default is FALSE.}
+\item{xLog}{A logical value that determines whether the X axis will be log
+transformed or not. The default is FALSE.}
 
 \item{facet}{A logical value of whether to facet or not. The default is FALSE.}
 

@@ -1,11 +1,4 @@
-library(shiny)
-library(ggplot2)
-library(dplyr)
-library(readr)
-library(readxl)
-library(tibble)
-library(rlang)
-
+# Define the UI for the Shiny app
 ui <- fluidPage(
   titlePanel("Dose-Response Regression Analysis"),
   sidebarLayout(
@@ -15,11 +8,9 @@ ui <- fluidPage(
       selectInput("dose", "Dose", choices = NULL),
       selectInput("response", "Response", choices = NULL),
       selectInput("regression_model", "Regression Model", choices = c("linear", "dose_response")),
-      conditionalPanel(
-        condition = "input.regression_model == 'dose_response'",
-        selectInput("dose_response_type", "Dose-Response Type", choices = c("stimulation", "inhibition"))
-      ),
-      checkboxInput("doseLog", "Is `Dose` data log10-transformed?", FALSE),
+      selectInput("dose_response_type", "Dose-Response Type (for dose response)", choices = c("stimulation", "inhibition")),
+      checkboxInput("doseLog", "Is `Dose` column log10-transformed?", FALSE),
+      checkboxInput("xLog", "Log10 transform X-axis?", FALSE),
       checkboxInput("facet", "Facet", FALSE),
       actionButton("analyze", "Run Analysis")
     ),
@@ -32,6 +23,7 @@ ui <- fluidPage(
   )
 )
 
+# Define the server logic for the Shiny app
 server <- function(input, output, session) {
 
   data <- reactive({
@@ -54,6 +46,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, "response", choices = cols)
   })
 
+  # Updated regression_result
   regression_result <- eventReactive(input$analyze, {
     req(input$group, input$dose, input$response)
     stat_regression(
@@ -62,7 +55,7 @@ server <- function(input, output, session) {
       dose = input$dose,
       response = input$response,
       regression_model = input$regression_model,
-      dose_response_type = if (input$regression_model == "dose_response") input$dose_response_type else NULL,
+      dose_response_type = input$dose_response_type,
       doseLog = input$doseLog
     )
   })
@@ -72,6 +65,7 @@ server <- function(input, output, session) {
     regression_result()
   })
 
+  # Updated regression_plot
   output$regression_plot <- renderPlot({
     req(input$group, input$dose, input$response)
     plot_regression(
@@ -81,10 +75,10 @@ server <- function(input, output, session) {
       response = input$response,
       regression_model = input$regression_model,
       dose_response_type = input$dose_response_type,
-      doseLog = input$doseLog,
       facet = input$facet
     )
   })
 }
 
+# Run the application
 shinyApp(ui, server)

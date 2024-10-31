@@ -4,7 +4,7 @@
 #' @param data A dataframe or tibble of data to be fitted.
 #' @param group The column containing the different categories in the data or file.
 #' @param dose The column in the data or file that will be used in plotting
-#' the X axis. If it is log10 transformed `doseLog` argument should be FALSE.
+#' the X axis. If it is log10 transformed `xLog` argument should be FALSE.
 #' @param response The column in the data or file that will be used in plotting
 #' the Y axis.
 #' @param regression_model The regression model; either "linear" or "dose_response".
@@ -12,9 +12,8 @@
 #' @param dose_response_type If `regression_model` is "dose_response" then specify
 #' whether the response is stimulatory ("stimulation") or inhibitory ("inhibition").
 #' The default is "stimulation".
-#' @param doseLog A logical value of whether the `dose` of the input data is log10
-#' transformed or not. If data is log10 transformed then the value should be
-#' TRUE otherwise FALSE. The default is FALSE.
+#' @param xLog A logical value that determines whether the X axis will be log
+#' transformed or not. The default is FALSE.
 #' @param facet A logical value of whether to facet or not. The default is FALSE.
 #' @param ... Other arguments to be passed to ggplot2.
 #'
@@ -30,7 +29,7 @@ plot_regression <- function(
     response,
     regression_model = c("linear", "dose_response"),
     dose_response_type = c("stimulation", "inhibition"),
-    doseLog = FALSE,
+    xLog = FALSE,
     facet = FALSE,
     ...
 ) {
@@ -70,13 +69,13 @@ plot_regression <- function(
       })
 
     for (level in names(fit_list)) {
-      # Generate x values spaced logarithmically if doseLog is TRUE
-      if (doseLog) {
-        data_fit <- data.frame(
+      # Generate x values based on xLog flag
+      data_fit <- if (xLog) {
+        data.frame(
           x = exp(seq(log(min(raw_data[[dose]], na.rm = TRUE)), log(max(raw_data[[dose]], na.rm = TRUE)), length.out = 100))
         )
       } else {
-        data_fit <- data.frame(
+        data.frame(
           x = seq(min(raw_data[[dose]], na.rm = TRUE), max(raw_data[[dose]], na.rm = TRUE), length.out = 100)
         )
       }
@@ -93,7 +92,7 @@ plot_regression <- function(
   }
 
   # Add log scale to x-axis if specified
-  if (doseLog) {
+  if (xLog) {
     p <- p + ggplot2::scale_x_log10()
   }
 
